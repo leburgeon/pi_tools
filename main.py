@@ -5,6 +5,7 @@ handling user input using curses, and calling the tools to perform the desired a
 
 import curses
 from display import DisplayManager, IDLING, DISPLAYING, TYPING
+from registry import execute_command
 
 
 # --- Constants for Key Codes ---
@@ -37,7 +38,7 @@ def process_keystroke(char_code: int, stdscr: 'curses._CursesWindow', display_ma
             stdscr.refresh()
             curses.napms(500)
 
-            result = "This is temporary text to simulate the result."
+            result = execute_command(input_buffer)
             display_manager.display_text(result)
             return "", True
 
