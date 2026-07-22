@@ -69,7 +69,7 @@ class DisplayManager:
         print(f"Formatted lines for display: {lines}")
 
         for i in range(self.num_lines):
-            self.lcd.write(i, 0, lines[i])
+            self.lcd.write(0, i, lines[i])
 
 
 if __name__ == "__main__":
