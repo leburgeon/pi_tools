@@ -38,14 +38,32 @@ class DisplayManager:
             self.current_page -= 1
             self.display_current_page()
 
-    def display_current_page(self):
-        """ Displays the current page of text on the LCD. This distributes the text across the available lines and handles any necessary padding or truncation. """
+    def _get_current_page_text(self) -> str:
+        """ Returns the text for the current page, given the current page number, number of lines, and the line length. """
         start_index = self.current_page * self.line_length * self.num_lines
         end_index = start_index + self.line_length * self.num_lines
         page_text = self.current_text[start_index:end_index]
 
-        # Debug statement
-        print(f"Displaying page {self.current_page + 1}: '{page_text}'")
+        return page_text
+
+    def _format_page_text_to_lines(self, page_text: str) -> list[str]:
+        """ Formats the page text into lines suitable for the LCD display. """
+        lines = []
+        for i in range(self.num_lines):
+            line_start = i * self.line_length
+            line_end = line_start + self.line_length
+            line_text = page_text[line_start:line_end].ljust(self.line_length)
+            lines.append(line_text)
+        return lines
+
+    def display_current_page(self):
+        """ Displays the current page of text on the LCD. This distributes the text across the available lines and handles any necessary padding or truncation. """
+        page_text = self._get_current_page_text()
+
+        lines = self._format_page_text_to_lines(page_text)
+
+        for i in range(self.num_lines):
+            self.lcd.write(i, 0, lines[i])
 
 
 if __name__ == "__main__":
