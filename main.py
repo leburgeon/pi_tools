@@ -64,7 +64,9 @@ def main():
 
     except KeyboardInterrupt:
         display_manager.destroy()
-        sys.exit(0)
+
+    finally:
+        display_manager.destroy()
 
 
 if __name__ == "__main__":
