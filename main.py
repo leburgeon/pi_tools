@@ -16,3 +16,7 @@ def main():
             lcd.write(0, 0, input_buffer)
     except KeyboardInterrupt:
         lcd.destroy()
+
+
+if __name__ == "__main__":
+    main()
