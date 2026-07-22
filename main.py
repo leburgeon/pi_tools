@@ -17,6 +17,10 @@ def main():
 
     try:
         while True:
+
+            print(
+                f"Current State: {display_manager.current_state}, Input Buffer: '{input_buffer}'")
+
             # Gets the single keypress from the user without waiting for Enter.
             char = get_single_keypress()
 
