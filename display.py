@@ -40,43 +40,34 @@ class DisplayManager:
         self.lcd.clear()
         self.lcd.closelight()
 
-    def get_idle_display(self) -> str:
-        """ Generates an IDLING display for the LCD. Fills the first line with the current date and the second line with the current time. If the date or time is shorter than the line length, it pads the centre with spaces. """
+    def get_idle_datetime_line(self) -> str:
+        """ Generates a datetime line for displaying on idle mode """
         date = datetime.now().strftime('%d/%m')
         time = datetime.now().strftime('%H:%M:%S')
+
         spaces_required = self.line_length - (len(date) + len(time))
-        first_line = date + (" " * spaces_required) + time
 
-        print(f'First Line: {first_line}')
-
-        lines = [" " * self.line_length] * self.num_lines
-
-        print(f"Lines: {lines}")
-
-        lines[0] = first_line
-
-        print(f"Lines: {lines}")
+        return date + (" " * spaces_required) + time
 
     def render(self):
         """ Renders the lines to the display based on the text to display and the current page """
-        if not self.display_text:
-            self.current_state = IDLING
 
         # If in idling mode, display idling display
         if self.current_state == IDLING:
-            lines = self.get_idle_display()
+            self.display_text_state = self.get_idle_datetime_line()
 
-        else:
-            text_to_display = self._get_current_page_text()
-            lines = self._format_page_text_to_lines(text_to_display)
+        # Gets the current page of text and formats the lines
+        text_to_display = self._get_current_page_text()
+        lines = self._format_page_text_to_lines(text_to_display)
 
+        # Writes the lines to the LCD bus
         for i in range(self.num_lines):
             self.lcd.write(0, i, lines[i])
 
     def reset(self):
         """ Clears the LCD display and resets the current text state, page number, and total pages. """
         self.lcd.clear()
-        self.display_text_state = ""
+        self.display_text_state = self.get_idle_datetime_line()
         self.current_display_page = 0
         self.total_display_pages = 0
         self.current_state = IDLING
