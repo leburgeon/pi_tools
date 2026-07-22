@@ -42,7 +42,7 @@ class DisplayManager:
 
     def get_idle_display(self) -> str:
         """ Generates an IDLING display for the LCD. Fills the first line with the current date and the second line with the current time. If the date or time is shorter than the line length, it pads the centre with spaces. """
-        date = datetime.now().strftime('%d/%m/%Y')
+        date = datetime.now().strftime('%d/%m/%y')
         time = datetime.now().strftime('%H:%M:%S')
 
         spaces_required = self.line_length - (len(date) + len(time))
