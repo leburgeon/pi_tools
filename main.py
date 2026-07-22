@@ -49,7 +49,7 @@ def main(stdscr):
                         # Briefly pause to show the execution message on terminal
                         curses.napms(500)
 
-                        result = "A result of the command execution. This text is meant to demonstrate the display of command results."
+                        result = "Yes, Tom is a massive wasteman!!"
                         display_manager.display_text(result)
                         input_buffer = ""
 
