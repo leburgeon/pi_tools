@@ -26,7 +26,7 @@ def main():
 
             # Handle Ctrl+C or Escape to Exit
             if char in ('\x03', '\x1b'):
-                print("Exiting...")
+                print(f"Exiting... received {char}")
                 break
 
             # Handle Enter Key (Execute Command)
