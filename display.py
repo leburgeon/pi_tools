@@ -51,8 +51,24 @@ class DisplayManager:
 if __name__ == "__main__":
     display_manager = DisplayManager()
     display_manager.new_text_state(
-        "Hello, this is a test message to demonstrate the LCD display management. It should handle pagination correctly. This part of the text will be on the second page.")
+        "Hello, th10 is a te20 message to demonstrate the LCD display management. It should handle pagination correctly. This part of the text will be on the second page.")
     display_manager.display_current_page()
+
+    print("Waiting for 2 seconds before moving to the next page...")
+    sleep(2)  # Wait for 2 seconds before moving to the next page
+    display_manager.next_page()
+
+    print("Waiting for 2 seconds before moving to the next page...")
+    sleep(2)  # Wait for 2 seconds before moving to the next page
+    display_manager.next_page()
+
+    print("Waiting for 2 seconds before moving to the next page...")
+    sleep(2)  # Wait for 2 seconds before moving to the next page
+    display_manager.next_page()
+
+    print("Waiting for 2 seconds before moving to the next page...")
+    sleep(2)  # Wait for 2 seconds before moving to the next page
+    display_manager.next_page()
 
     print("Waiting for 2 seconds before moving to the next page...")
     sleep(2)  # Wait for 2 seconds before moving to the next page
