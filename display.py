@@ -2,6 +2,7 @@
 The render() method must be called after any changes to the display state to reflect those changes on the LCD. """
 
 from time import sleep
+from datetime import datetime
 
 from LCD1602 import CharLCD1602
 
@@ -39,11 +40,26 @@ class DisplayManager:
         self.lcd.clear()
         self.lcd.closelight()
 
+    def get_idle_display(self) -> str:
+        """ Generates an IDLING display for the LCD. Fills the first line with the current date and the second line with the current time. If the date or time is shorter than the line length, it pads the centre with spaces. """
+        date = datetime.now().strftime('%d/%m/%Y')
+        time = datetime.now().strftime('%H:%M:%S')
+
+        spaces_required = self.line_length - (len(date) + len(time))
+
+        return date + (" " * spaces_required) + time
+
     def render(self):
         """ Renders the lines to the display based on the text to display and the current page """
-        text_to_display = self._get_current_page_text()
+        if not self.display_text:
+            self.current_state = IDLING
 
-        lines = self._format_page_text_to_lines(text_to_display)
+        # If in idling mode, display idling display
+        if self.current_state == IDLING:
+            lines = self.get_idle_display()
+        else:
+            text_to_display = self._get_current_page_text()
+            lines = self._format_page_text_to_lines(text_to_display)
 
         for i in range(self.num_lines):
             self.lcd.write(0, i, lines[i])
@@ -118,33 +134,5 @@ if __name__ == "__main__":
     display_manager = DisplayManager()
     display_manager.display_text(
         "Hello, this is a test message to demonstrate the LCD display management. It should handle pagination correctly. This part of the text will be on the second page.")
-    display_manager.display_current_page()
 
-    print("Waiting for 2 seconds before moving to the next page...")
-    sleep(2)  # Wait for 2 seconds before moving to the next page
-    display_manager.next_page()
-
-    print("Waiting for 2 seconds before moving to the next page...")
-    sleep(2)  # Wait for 2 seconds before moving to the next page
-    display_manager.next_page()
-
-    print("Waiting for 2 seconds before moving to the next page...")
-    sleep(2)  # Wait for 2 seconds before moving to the next page
-    display_manager.next_page()
-
-    print("Waiting for 2 seconds before moving to the next page...")
-    sleep(2)  # Wait for 2 seconds before moving to the next page
-    display_manager.next_page()
-
-    # Turn off the backlight after displaying the text
-    display_manager.lcd.closelight()
-
-    print("Waiting for 2 seconds before moving to the next page...")
-    sleep(2)  # Wait for 2 seconds before moving to the next page
-    display_manager.next_page()
-
-    print("Waiting for 2 seconds before moving back to the previous page...")
-    sleep(2)  # Wait for 2 seconds before moving back to the previous page
-    display_manager.previous_page()
-
-    display_manager.reset()
+    print(display_manager.get_idle_display())
