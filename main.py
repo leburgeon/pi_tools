@@ -7,6 +7,13 @@ import curses
 from display import DisplayManager, IDLING, DISPLAYING, TYPING
 
 
+# --- Constants for Key Codes ---
+KEY_CTRL_C = 3
+KEY_ESC = 27
+KEYS_ENTER = (10, 13, curses.KEY_ENTER)
+KEYS_BACKSPACE = (8, 127, curses.KEY_BACKSPACE)
+
+
 def render_terminal_debug(stdscr: 'curses._CursesWindow', display_manager: DisplayManager, input_buffer: str) -> None:
     """Clears the terminal screen and displays current debug information."""
     stdscr.clear()
@@ -17,26 +24,22 @@ def render_terminal_debug(stdscr: 'curses._CursesWindow', display_manager: Displ
 
 
 def process_keystroke(char_code: int, stdscr: 'curses._CursesWindow', display_manager: DisplayManager, input_buffer: str) -> tuple[str, bool]:
-    """
-    Processes a single keystroke and updates the display manager and input buffer accordingly.
-    Returns a tuple containing the (updated_input_buffer, keep_running_flag).
-    """
-    # Handle Ctrl+C (3) or Escape (27) to Exit
-    if char_code in (3, 27):
+    """Processes a single keystroke and updates the display manager and input buffer."""
+
+    if char_code in (KEY_CTRL_C, KEY_ESC):
         stdscr.addstr(3, 0, "Exiting...")
         stdscr.refresh()
         return input_buffer, False
 
-    # Handle Enter Key (10 is \n, 13 is \r)
-    if char_code in (10, 13, curses.KEY_ENTER):
+    if char_code in KEYS_ENTER:
         if display_manager.current_state == TYPING and input_buffer.strip():
             stdscr.addstr(3, 0, f"Executing command: {input_buffer}")
             stdscr.refresh()
-            curses.napms(500)  # Briefly pause to show the execution message
+            curses.napms(500)
 
-            result = "Yes, Tom is a massive wasteman!!"
+            result = "This is temporary text to simulate the result."
             display_manager.display_text(result)
-            return "", True  # Clear buffer on submission
+            return "", True
 
         elif display_manager.current_state == DISPLAYING:
             stdscr.addstr(
@@ -45,19 +48,17 @@ def process_keystroke(char_code: int, stdscr: 'curses._CursesWindow', display_ma
             display_manager.reset()
             return input_buffer, True
 
-    # Handle Left/Right Arrow Keys for Pagination
     if char_code == curses.KEY_LEFT and display_manager.current_state == DISPLAYING:
         display_manager.previous_page()
+
     elif char_code == curses.KEY_RIGHT and display_manager.current_state == DISPLAYING:
         display_manager.next_page()
 
-    # Handle Backspace Key (127 is DEL, 8 is Backspace)
-    elif char_code in (8, 127, curses.KEY_BACKSPACE):
+    elif char_code in KEYS_BACKSPACE:
         if display_manager.current_state == TYPING and input_buffer:
             input_buffer = input_buffer[:-1]
             display_manager.update_typing(input_buffer)
 
-    # Handle Standard Typing (Printable ASCII range 32 to 126)
     elif 32 <= char_code <= 126:
         if display_manager.current_state in (TYPING, IDLING):
             input_buffer += chr(char_code)

@@ -34,6 +34,11 @@ class DisplayManager:
 
         self.current_state = IDLING
 
+    @property
+    def page_capacity(self) -> int:
+        """Returns the total number of characters that can fit on one page."""
+        return self.line_length * self.num_lines
+
     # GENERAL CONTROL
 
     def destroy(self) -> None:
@@ -52,15 +57,16 @@ class DisplayManager:
 
     def _calculate_total_pages(self, text: str) -> int:
         """Calculates the total number of pages required to display the given text."""
-        capacity = self.line_length * self.num_lines
-        return (len(text) + capacity - 1) // capacity
+        return (len(text) + self.page_capacity - 1) // self.page_capacity
 
     def render(self) -> None:
-        """Renders the lines to the display based on the text to display and the current page."""
+        """Renders the lines to the display based on the current state."""
+        # Determine what text to render without modifying self.display_text_state
         if self.current_state == IDLING:
-            self.display_text_state = self.get_idle_datetime_line()
+            text_to_display = self.get_idle_datetime_line()
+        else:
+            text_to_display = self._get_current_page_text()
 
-        text_to_display = self._get_current_page_text()
         lines = self._format_page_text_to_lines(text_to_display)
 
         for i in range(self.num_lines):
@@ -69,7 +75,7 @@ class DisplayManager:
     def reset(self) -> None:
         """Clears the LCD display and resets the current text state, page number, and total pages."""
         self.lcd.clear()
-        self.display_text_state = self.get_idle_datetime_line()
+        self.display_text_state = ""
         self.current_display_page = 0
         self.total_display_pages = 0
         self.current_state = IDLING
@@ -96,21 +102,18 @@ class DisplayManager:
 
     def _get_current_page_text(self) -> str:
         """Returns the text for the current page based on pagination parameters."""
-        start_index = self.current_display_page * self.line_length * self.num_lines
-        end_index = start_index + self.line_length * self.num_lines
+        start_index = self.current_display_page * self.page_capacity
+        end_index = start_index + self.page_capacity
         return self.display_text_state[start_index:end_index]
 
     def _format_page_text_to_lines(self, page_text: str) -> list[str]:
-        """
-        Formats the page text into lines suitable for the LCD display.
-        Returns a list of strings padded or truncated to the line length.
-        """
+        """Formats the page text into LCD lines, padding with spaces if necessary."""
         lines = []
         for i in range(self.num_lines):
             line_start = i * self.line_length
-            line_end = line_start + self.line_length
-            line_text = page_text[line_start:line_end].ljust(self.line_length)
-            lines.append(line_text)
+            # Slicing out of bounds in Python safely returns up to the end of the string
+            line_text = page_text[line_start: line_start + self.line_length]
+            lines.append(line_text.ljust(self.line_length))
         return lines
 
     # TYPING
