@@ -92,6 +92,9 @@ if __name__ == "__main__":
     sleep(2)  # Wait for 2 seconds before moving to the next page
     display_manager.next_page()
 
+    # Turn off the backlight after displaying the text
+    display_manager.lcd.closelight()
+
     print("Waiting for 2 seconds before moving to the next page...")
     sleep(2)  # Wait for 2 seconds before moving to the next page
     display_manager.next_page()
