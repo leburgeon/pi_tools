@@ -45,7 +45,7 @@ class DisplayManager:
         """Generates a formatted datetime string for idle mode."""
         now = datetime.now()
         date_str = now.strftime('%d/%m')
-        time_str = now.strftime('%H:%M:%S')
+        time_str = now.strftime('%H:%M')
 
         spaces_required = self.line_length - (len(date_str) + len(time_str))
         return date_str + (" " * spaces_required) + time_str
