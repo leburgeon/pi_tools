@@ -48,25 +48,23 @@ class DisplayManager:
         return page_text
 
     def _format_page_text_to_lines(self, page_text: str) -> list[str]:
-        """ Formats the page text into lines suitable for the LCD display. """
+        """ Formats the page text into lines suitable for the LCD display. 
+        Returns a list of strings, each representing a line on the LCD. If the text is shorter than the line length, it pads with spaces. If it's longer, it truncates to fit the line length. """
         lines = []
+        # For each available line on the LCD, slice the page text and pad it to the line length.
         for i in range(self.num_lines):
             line_start = i * self.line_length
             line_end = line_start + self.line_length
             line_text = page_text[line_start:line_end].ljust(self.line_length)
             lines.append(line_text)
+
         return lines
 
     def display_current_page(self):
         """ Displays the current page of text on the LCD. This distributes the text across the available lines and handles any necessary padding or truncation. """
         page_text = self._get_current_page_text()
 
-        print(
-            f"Current page: {self.current_page + 1}/{self.total_pages}, Displaying text: '{page_text}', Length: {len(page_text)}")
-
         lines = self._format_page_text_to_lines(page_text)
-
-        print(f"Formatted lines for display: {lines}")
 
         for i in range(self.num_lines):
             self.lcd.write(0, i, lines[i])
@@ -101,3 +99,5 @@ if __name__ == "__main__":
     print("Waiting for 2 seconds before moving back to the previous page...")
     sleep(2)  # Wait for 2 seconds before moving back to the previous page
     display_manager.previous_page()
+
+    display_manager.clear_text_state()
