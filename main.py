@@ -54,7 +54,7 @@ def main():
             elif char in ('\x7f', '\x08'):
                 if display_manager.current_state == TYPING and input_buffer:
                     input_buffer = input_buffer[:-1]
-                    display_manager.update_input(input_buffer)
+                    display_manager.update_typing(input_buffer)
 
             elif display_manager.current_state == TYPING or display_manager.current_state == IDLING:
                 input_buffer += char
