@@ -44,10 +44,12 @@ class DisplayManager:
         """ Generates an IDLING display for the LCD. Fills the first line with the current date and the second line with the current time. If the date or time is shorter than the line length, it pads the centre with spaces. """
         date = datetime.now().strftime('%d/%m')
         time = datetime.now().strftime('%H:%M:%S')
-
         spaces_required = self.line_length - (len(date) + len(time))
+        first_line = date + (" " * spaces_required) + time
 
-        return date + (" " * spaces_required) + time
+        lines = [" " * self.line_length] * self.num_lines
+
+        lines[0] = first_line
 
     def render(self):
         """ Renders the lines to the display based on the text to display and the current page """
@@ -57,6 +59,7 @@ class DisplayManager:
         # If in idling mode, display idling display
         if self.current_state == IDLING:
             lines = self.get_idle_display()
+
         else:
             text_to_display = self._get_current_page_text()
             lines = self._format_page_text_to_lines(text_to_display)
