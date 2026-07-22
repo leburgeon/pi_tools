@@ -14,7 +14,8 @@ def main(stdscr):
     """
     # Setup curses environment
     curses.curs_set(0)     # Hide the blinking terminal cursor
-    stdscr.nodelay(False)  # Block and wait for user input
+    # Waits 50ms before running the loop to continue the render
+    stdscr.timeout(50)
 
     display_manager = DisplayManager(line_length=16, num_lines=2)
     input_buffer = ""
@@ -31,50 +32,53 @@ def main(stdscr):
             # getch() safely waits for a key and handles escape sequences for you
             char_code = stdscr.getch()
 
-            # Handle Ctrl+C (3) or Escape (27) to Exit
-            if char_code in (3, 27):
-                stdscr.addstr(3, 0, "Exiting...")
-                stdscr.refresh()
-                break
+            if char_code != -1:  # Checks to see if a character has been entered
 
-            # Handle Enter Key (10 is \n, 13 is \r)
-            elif char_code in (10, 13, curses.KEY_ENTER):
-                if display_manager.current_state == TYPING and input_buffer.strip():
-                    stdscr.addstr(3, 0, f"Executing command: {input_buffer}")
+                # Handle Ctrl+C (3) or Escape (27) to Exit
+                if char_code in (3, 27):
+                    stdscr.addstr(3, 0, "Exiting...")
                     stdscr.refresh()
-                    # Briefly pause to show the execution message on terminal
-                    curses.napms(500)
+                    break
 
-                    result = "A result of the command execution. This text is meant to demonstrate the display of command results."
-                    display_manager.display_text(result)
-                    input_buffer = ""
+                # Handle Enter Key (10 is \n, 13 is \r)
+                elif char_code in (10, 13, curses.KEY_ENTER):
+                    if display_manager.current_state == TYPING and input_buffer.strip():
+                        stdscr.addstr(
+                            3, 0, f"Executing command: {input_buffer}")
+                        stdscr.refresh()
+                        # Briefly pause to show the execution message on terminal
+                        curses.napms(500)
 
-                elif display_manager.current_state == DISPLAYING:
-                    stdscr.addstr(
-                        3, 0, "Exiting display mode and returning to typing mode.")
-                    stdscr.refresh()
-                    display_manager.reset()
+                        result = "A result of the command execution. This text is meant to demonstrate the display of command results."
+                        display_manager.display_text(result)
+                        input_buffer = ""
 
-            # Handles Left/Right Arrow Keys
-            elif char_code == curses.KEY_LEFT:
-                if display_manager.current_state == DISPLAYING:
-                    display_manager.previous_page()
+                    elif display_manager.current_state == DISPLAYING:
+                        stdscr.addstr(
+                            3, 0, "Exiting display mode and returning to typing mode.")
+                        stdscr.refresh()
+                        display_manager.reset()
 
-            elif char_code == curses.KEY_RIGHT:
-                if display_manager.current_state == DISPLAYING:
-                    display_manager.next_page()
+                # Handles Left/Right Arrow Keys
+                elif char_code == curses.KEY_LEFT:
+                    if display_manager.current_state == DISPLAYING:
+                        display_manager.previous_page()
 
-            # Handle Backspace Key (127 is DEL, 8 is Backspace)
-            elif char_code in (8, 127, curses.KEY_BACKSPACE):
-                if display_manager.current_state == TYPING and input_buffer:
-                    input_buffer = input_buffer[:-1]
-                    display_manager.update_typing(input_buffer)
+                elif char_code == curses.KEY_RIGHT:
+                    if display_manager.current_state == DISPLAYING:
+                        display_manager.next_page()
 
-            # Handle Standard Typing (Printable ASCII range 32 to 126)
-            elif 32 <= char_code <= 126:
-                if display_manager.current_state in (TYPING, IDLING):
-                    input_buffer += chr(char_code)
-                    display_manager.update_typing(input_buffer)
+                # Handle Backspace Key (127 is DEL, 8 is Backspace)
+                elif char_code in (8, 127, curses.KEY_BACKSPACE):
+                    if display_manager.current_state == TYPING and input_buffer:
+                        input_buffer = input_buffer[:-1]
+                        display_manager.update_typing(input_buffer)
+
+                # Handle Standard Typing (Printable ASCII range 32 to 126)
+                elif 32 <= char_code <= 126:
+                    if display_manager.current_state in (TYPING, IDLING):
+                        input_buffer += chr(char_code)
+                        display_manager.update_typing(input_buffer)
 
             # Render updates to the physical hardware LCD
             display_manager.render()
