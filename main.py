@@ -5,7 +5,7 @@ handling user input using curses, and calling the tools to perform the desired a
 
 import curses
 from display import DisplayManager, IDLING, DISPLAYING, TYPING
-from registry import execute_command
+from registry import execute_command, load_tools
 
 
 # --- Constants for Key Codes ---
@@ -78,6 +78,8 @@ def main(stdscr: 'curses._CursesWindow') -> None:
     display_manager = DisplayManager(line_length=16, num_lines=2)
     input_buffer = ""
     keep_running = True
+
+    load_tools()  # Loads the tools registry
 
     try:
         while keep_running:
