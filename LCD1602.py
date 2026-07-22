@@ -168,15 +168,12 @@ class CharLCD1602(object):
         and then closes the SMBus connection.
         """
         self.bus.write_byte(self.LCD_ADDR, 0x08)
-        self.bus.close()
 
     def closelight(self) -> None:
         """
-        [PUBLIC] Hardcodes a command to manually turn off the backlight via I2C address 0x27,
-        and then closes the SMBus connection.
+        [PUBLIC] Hardcodes a command to manually turn off the backlight via I2C address 0x27.
         """
         self.bus.write_byte(self.LCD_ADDR, 0x00)
-        self.bus.close()
 
     def write(self, x: int, y: int, text: str) -> None:
         """
