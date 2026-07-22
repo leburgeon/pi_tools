@@ -13,6 +13,7 @@ class DisplayManager:
         self.num_lines = num_lines
         self.current_text = ""
         self.current_page = 0
+        self.total_pages = 0
 
     def clear_text_state(self):
         """ Clears the LCD display and resets the current text state. """
@@ -23,12 +24,12 @@ class DisplayManager:
         """ Updates the current text to display and resets the page number. """
         self.current_text = text_to_display
         self.current_page = 0  # Reset to the first page whenever the text is updated
+        self.total_pages = (len(self.current_text) + self.line_length *
+                            self.num_lines - 1) // (self.line_length * self.num_lines)
 
     def next_page(self):
         """ Advances to the next page of text, if available. """
-        total_pages = (len(self.current_text) + self.line_length *
-                       self.num_lines - 1) // (self.line_length * self.num_lines)
-        if self.current_page < total_pages - 1:
+        if self.current_page < self.total_pages - 1:
             self.current_page += 1
             self.display_current_page()
 
@@ -60,7 +61,12 @@ class DisplayManager:
         """ Displays the current page of text on the LCD. This distributes the text across the available lines and handles any necessary padding or truncation. """
         page_text = self._get_current_page_text()
 
+        print(
+            f"Current page: {self.current_page + 1}/{self.total_pages}, Displaying text: '{page_text}', Length: {len(page_text)}")
+
         lines = self._format_page_text_to_lines(page_text)
+
+        print(f"Formatted lines for display: {lines}")
 
         for i in range(self.num_lines):
             self.lcd.write(i, 0, lines[i])
@@ -69,7 +75,7 @@ class DisplayManager:
 if __name__ == "__main__":
     display_manager = DisplayManager()
     display_manager.new_text_state(
-        "Hello, th10 is a te20 message to demonstrate the LCD display management. It should handle pagination correctly. This part of the text will be on the second page.")
+        "Hello, this is a test message to demonstrate the LCD display management. It should handle pagination correctly. This part of the text will be on the second page.")
     display_manager.display_current_page()
 
     print("Waiting for 2 seconds before moving to the next page...")
