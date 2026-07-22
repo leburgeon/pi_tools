@@ -23,7 +23,6 @@ class DisplayManager:
         """ Updates the current text to display and resets the page number. """
         self.current_text = text_to_display
         self.current_page = 0  # Reset to the first page whenever the text is updated
-        self.display_current_page()  # Display the first page of the new text
 
     def next_page(self):
         """ Advances to the next page of text, if available. """
