@@ -4,7 +4,7 @@ import sys
 
 from LCD1602 import CharLCD1602
 from input_handler import get_single_keypress
-from display import DisplayManager, DISPLAYING, TYPING
+from display import IDLING, DisplayManager, DISPLAYING, TYPING
 
 
 def main():
@@ -56,7 +56,7 @@ def main():
                     input_buffer = input_buffer[:-1]
                     display_manager.update_input(input_buffer)
 
-            elif display_manager.current_state == TYPING:
+            elif display_manager.current_state == TYPING or display_manager.current_state == IDLING:
                 input_buffer += char
                 display_manager.update_typing(input_buffer)
 
