@@ -4,19 +4,20 @@ import sys
 
 from LCD1602 import CharLCD1602
 from input_handler import get_single_keypress
+from display import DisplayManager, DISPLAYING, TYPING
 
 
 def main():
     """
     The main function that initializes the LCD and starts the REPL loop.
     """
-    lcd = CharLCD1602()
-    lcd.init_lcd(addr=None, bl=1)
+    display_manager = DisplayManager(line_length=16, num_lines=2)
+
+    input_buffer = ""
 
     try:
         while True:
-            input_buffer = ""
-
+            # Gets the single keypress from the user without waiting for Enter.
             char = get_single_keypress()
 
             # Handle Ctrl+C or Escape to Exit
@@ -25,20 +26,40 @@ def main():
                 break
 
             # Handle Enter Key (Execute Command)
-            if char in ('\r', '\n'):
-                print(f"Executing command: {input_buffer}")
-                # Here you would call the appropriate function to handle the command.
-                # For demonstration, we'll just clear the input buffer.
-                input_buffer = ""
-                lcd.clear()
-                continue
+            elif char in ('\r', '\n'):
+                # Handles Enter Key when the display is in TYPING state and the input buffer is not empty
+                if display_manager.current_state == TYPING and input_buffer.strip():
+                    print(f"Executing command: {input_buffer}")
+                    result = "A result of the command execution. This text is meant to demonstrate the display of command results."
+                    display_manager.display_text(result)
+                    input_buffer = ""
+
+                elif display_manager.current_state == DISPLAYING:
+                    print('Exiting display mode and returning to typing mode.')
+                    display_manager.reset()
+
+            # Handles left/right arrow keys for navigation (if needed)
+            elif char in ('\x1b[D', '\x1b[C'):  # Left and Right Arrow Keys
+                if display_manager.current_state == DISPLAYING:
+                    if char == '\x1b[D':  # Left Arrow
+                        display_manager.previous_page()
+                    elif char == '\x1b[C':  # Right Arrow
+                        display_manager.next_page()
 
             # Handle Backspace Key
             elif char in ('\x7f', '\x08'):
-                input_buffer = input_buffer[:-1]
+                if display_manager.current_state == TYPING and input_buffer:
+                    input_buffer = input_buffer[:-1]
+                    display_manager.update_input(input_buffer)
+
+            elif display_manager.current_state == TYPING:
+                input_buffer += char
+                display_manager.update_typing(input_buffer)
+
+            display_manager.render()
 
     except KeyboardInterrupt:
-        lcd.destroy()
+        display_manager.destroy()
         sys.exit(0)
 
 
