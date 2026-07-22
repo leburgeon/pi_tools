@@ -47,9 +47,15 @@ class DisplayManager:
         spaces_required = self.line_length - (len(date) + len(time))
         first_line = date + (" " * spaces_required) + time
 
+        print(f'First Line: {first_line}')
+
         lines = [" " * self.line_length] * self.num_lines
 
+        print(f"Lines: {lines}")
+
         lines[0] = first_line
+
+        print(f"Lines: {lines}")
 
     def render(self):
         """ Renders the lines to the display based on the text to display and the current page """
