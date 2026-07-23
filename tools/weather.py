@@ -8,7 +8,7 @@ from zoneinfo import ZoneInfo
 
 from registry import register_tool
 
-TOOL_USE_MESSAGE = "A tool for fetching condensed weather information to be displayed on an LCD \nArgs: location: str \nReturns a list of strings, each representing a page of information for the LCD."
+TOOL_USE_MESSAGE = "A tool for fetching condensed weather information to be displayed on an LCD \nArgs: location: str \nReturns a list of strings, each representing a slide of information for the LCD."
 
 MET_OFFICE_API_URL = "https://data.hub.api.metoffice.gov.uk/sitespecific/v0"
 

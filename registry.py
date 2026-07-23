@@ -40,6 +40,6 @@ def execute_command(command_str) -> list[str]:
         except TypeError as e:
             return [f"Err: Invalid args"]
         except Exception as e:
-            return [f"Err: {str(e)[:12]}"]
+            return [f"Err: {str(e)}"]
 
     return [f"Unknown: {cmd}"]
