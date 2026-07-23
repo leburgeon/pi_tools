@@ -95,9 +95,9 @@ class DisplayManager:
 
     def wake(self) -> None:
         """ Waking up the screen by turning the backlight on """
-        self.lcd.write(0, 0, "Waking up...")
+        self.lcd.write(0, 0, "Hello!")
         self.lcd.openlight()
-        sleep(0.8)
+        sleep(0.6)
 
     # DISPLAY
 
