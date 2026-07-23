@@ -4,6 +4,7 @@ from os import environ
 from geopy.geocoders import Nominatim
 from pprint import pp
 from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from registry import register_tool
 
@@ -66,6 +67,10 @@ WEATHER_CODES = {
     30: "Thunder"
 }
 
+# -- Timezone --
+
+UK_TZ = ZoneInfo('Europe/London')
+
 
 def validate_weather_args(args: list[str]) -> str:
     "For validating the args being passed to the weather tool. "
@@ -127,11 +132,6 @@ def get_met_office_response(url: str, api_key: str, lat_long: tuple) -> Response
     return response
 
 
-def construct_met_office_url(base_url: str, endpoint: str, latlong: tuple) -> str:
-    """For constructing a url for requesting weather from the met office using lat long"""
-    return
-
-
 def generate_error_message(error: str):
     """ For generating an error message including the tool use, and returning as a list of string to be displayed by the LCD"""
     return [f"Error: {error}" + TOOL_USE_MESSAGE]
@@ -162,7 +162,7 @@ def format_time_point_hourly(weather_data: dict) -> str:
     {
         time: isoformat
         screenTemperature: float -> Temp in C
-        feelsLikeTemp: float -> feels like temp in C
+        feelsLikeTemperature: float -> feels like temp in C
         significantWeatherCode: int -> for description
         precipitationRate: int -> mm/h
         probOfPrecipitation: int -> % probability of precipitation
@@ -173,8 +173,9 @@ def format_time_point_hourly(weather_data: dict) -> str:
     """
     try:
 
-        point_time = datetime.fromisoformat(weather_data['time'])
-        point_temp_feels_like = weather_data['feelsLikeTemp']
+        point_time = datetime.fromisoformat(
+            weather_data['time']).astimezone(UK_TZ)
+        point_temp_feels_like = weather_data['feelsLikeTemperature']
         chance_precip = weather_data['probOfPrecipitation']
         precip_rate = weather_data['precipitationRate']
     except AttributeError as e:
@@ -182,12 +183,13 @@ def format_time_point_hourly(weather_data: dict) -> str:
 
     date = point_time.strftime('%d/%m')
     time = point_time.strftime('%H:%M')
+    point_temp_feels_like = round(float(point_temp_feels_like))
     first_line = f"{date} {time} {point_temp_feels_like}C".ljust(
         LCD_LINE_LENGTH, " ")
 
-    chance_precip = f"{str(chance_precip).rjust(3, '0')}%"
-    precip_rate = f"{float(precip_rate):05.2f}mm"
-    second_line = f"{chance_precip} {precip_rate} @@".ljust(16, " ")
+    chance_precip = str(chance_precip).rjust(3, '0')
+    precip_rate = f"{float(precip_rate):05.2f}"
+    second_line = f"{chance_precip}% {precip_rate}mm @@".ljust(16, " ")
 
     return first_line + second_line
 
@@ -225,8 +227,8 @@ def weather(*args: list[str]) -> list[str]:
     if not response.status_code == 200:
         return generate_error_message(f'Error fetching weather response: \nCode:{response.status_code}\nMessage:{response.json()}')
 
-    return format_weather_response_by_frequency(response.json(), 'daily')
+    return format_hourly_weather_response(response.json())
 
 
 if __name__ == "__main__":
-    pp(weather('bermondsey'))
+    pp(weather('home'))
