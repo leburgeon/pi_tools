@@ -90,8 +90,12 @@ class DisplayManager:
     def display_slides(self, slides_to_display: list[str]) -> None:
         """Sets the slides to display, setting the first of the slides to the display text.
         Each slide represents a chunk or group of information to display, and can be spread across multiple display pages."""
-        if len(slides_to_display) == 1:
+        if slides_to_display:
             self.display_text(slides_to_display[0])
+
+            if len(slides_to_display) > 1:
+                self.slides = slides_to_display
+                self.current_slide = 0
 
     def display_text(self, text_to_display: str) -> None:
         """Sets the display mode to show the provided text and calculates pagination."""
