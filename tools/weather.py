@@ -198,7 +198,7 @@ def format_weather_info_page(location: str, freq: str) -> str:
     """ Formats the info page for the LCD """
     first_line = f"Weather({freq})"
     first_line += " " * (LCD_LINE_LENGTH - len(first_line))
-    return first_line + f"Loc: {location}"
+    return first_line + f"{location}"
 
 
 @register_tool("weather", TOOL_USE_MESSAGE)
