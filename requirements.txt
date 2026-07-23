@@ -2,3 +2,5 @@ requests
 python-dotenv
 geopy
 smbus; sys_platform == 'linux'
+google-genai
+pydantic
