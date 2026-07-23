@@ -204,6 +204,13 @@ def format_weather_info_page(location: str, freq: str) -> str:
 @register_tool("weather", TOOL_USE_MESSAGE)
 def weather(*args: list[str]) -> list[str]:
 
+    return ['Weather(Hourly) Loc: Crystal Palace National Sports Centre',
+            '23/07 18:00 26C 005% 00.00mm @@ ',
+            '23/07 19:00 25C 005% 00.00mm @@ ',
+            '23/07 20:00 22C 004% 00.00mm @@ ',
+            '23/07 21:00 21C 005% 00.00mm @@ ',
+            'A single page which goes too farrrr off the end? and then what? We go to the end of different screens?']
+
     # Validates the args for the weather tool
     invalidation = validate_weather_args(args)
     if invalidation:
