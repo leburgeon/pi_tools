@@ -216,6 +216,17 @@ class CharLCD1602(object):
 
 lcd1602 = CharLCD1602()
 
+
+def loop():
+    """ Main loop for testing the LCD display. """
+    while True:
+        lcd1602.write(0, 0, "Hello, World!")
+        lcd1602.write(0, 1, "LCD Test")
+        time.sleep(2)
+        lcd1602.clear()
+        time.sleep(1)
+
+
 if __name__ == '__main__':
     print('Program is starting ... ')
     lcd1602.init_lcd(addr=None, bl=1)
