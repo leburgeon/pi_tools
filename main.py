@@ -118,6 +118,8 @@ def main(stdscr: 'curses._CursesWindow') -> None:
                 if time.time() - last_activity > INACTIVITY_LIMIT:
                     sleep_until_woken(display_manager, stdscr)
 
+                    last_activity = time.time()  # Sets the last activity to now, since woken
+
             # 4. Render updates to the physical hardware LCD
             display_manager.render()
 
