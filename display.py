@@ -152,7 +152,30 @@ class DisplayManager:
 if __name__ == "__main__":
     display_manager = DisplayManager()
     display_manager.display_text(
-        "Hello, this is a test message to demonstrate the LCD display management. "
-        "It should handle pagination correctly. This part of the text will be on the second page."
+        "Hello, this is a test message to demonstrate the LCD display management. It should handle pagination correctly. This part of the text will be on the second page."
     )
-    print(display_manager.get_idle_datetime_line())
+    sleep(3)
+
+    display_manager.display_slides(['Weather(Hourly) Loc: Crystal Pasdfasdalace National Sports Centre',
+                                    '23/07 18:00 26C 005% 00.00mm @@ ',
+                                    '23/07 19:00 25C 005% 00.00mm @@ ',
+                                    '23/07 20:00 22C 004% 00.00mm @@ ',
+                                    '23/07 21:00 21C 005% 00.00mm @@ '])
+
+    sleep(2)
+
+    display_manager.next_page()
+
+    sleep(2)
+
+    display_manager.next_page()
+
+    sleep(2)
+
+    display_manager.next_page()
+    sleep(2)
+
+    display_manager.next_page()
+    sleep(2)
+
+    display_manager.next_page()
