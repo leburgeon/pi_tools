@@ -97,7 +97,7 @@ class DisplayManager:
         self.lcd.clear()
         self.lcd.write(0, 0, "Waking up...")
         self.lcd.openlight()
-        sleep(1)
+        sleep(.5)
 
     # DISPLAY
 
