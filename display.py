@@ -102,14 +102,21 @@ class DisplayManager:
             self.display_text_state)
 
     def next_page(self) -> None:
-        """Advances to the next page of text, if available."""
+        """Advances to the next page of text within the slide if available.
+        If not, checks if there is a new slide, and updates the display with that slide"""
         if self.current_display_page < self.total_display_pages - 1:
             self.current_display_page += 1
+        elif self.current_slide < len(self.slides) - 1:
+            self.current_slide += 1
+            self.display_text(self.slides[self.current_slide])
 
     def previous_page(self) -> None:
         """Goes back to the previous page of text, if available."""
         if self.current_display_page > 0:
             self.current_display_page -= 1
+        elif self.current_slide > 0:
+            self.current_slide -= 1
+            self.display_text(self.slides[self.current_slide])
 
     def _get_current_page_text(self) -> str:
         """Returns the text for the current page based on pagination parameters."""
