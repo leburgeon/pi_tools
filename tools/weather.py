@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from os import environ
 from geopy.geocoders import Nominatim
 from pprint import pp
+from datetime import datetime
 
 from registry import register_tool
 
@@ -136,7 +137,7 @@ def generate_error_message(error: str):
     return [f"Error: {error}" + TOOL_USE_MESSAGE]
 
 
-def format_weather_response_by_freq(weather_response: dict, freq: str) -> list[str]:
+def format_hourly_weather_response(weather_response: dict) -> list[str]:
     """ For formatting the weather response slides. Includes an info page on the first page"""
     response_slides = []
 
@@ -147,13 +148,12 @@ def format_weather_response_by_freq(weather_response: dict, freq: str) -> list[s
     except AttributeError:
         return generate_error_message("Weather attribute location did not exist")
 
-    response_slides.append(format_weather_info_page(location, freq))
+    response_slides.append(format_weather_info_page(location, HOURLY))
+
+    for hourly in weather_response['features'][0]['properties']['timeSeries']:
+        response_slides.append(format_time_point_hourly(hourly))
 
     return response_slides
-
-# 00/00 00:00 00C
- #   6.  12.
-#
 
 
 def format_time_point_hourly(weather_data: dict) -> str:
@@ -166,7 +166,30 @@ def format_time_point_hourly(weather_data: dict) -> str:
         significantWeatherCode: int -> for description
         precipitationRate: int -> mm/h
         probOfPrecipitation: int -> % probability of precipitation
-    }"""
+    }
+    Hourly slides are returned as:
+       00/00 00:00 00C (date time feels-like temp(c))
+       000% 00.00mm @@ (chance-precip precip mm chars)
+    """
+    try:
+
+        point_time = datetime.fromisoformat(weather_data['time'])
+        point_temp_feels_like = weather_data['feelsLikeTemp']
+        chance_precip = weather_data['probOfPrecipitation']
+        precip_rate = weather_data['precipitationRate']
+    except AttributeError as e:
+        return generate_error_message(f"Weather time point did not have attribute {e}")
+
+    date = point_time.strftime('%d/%m')
+    time = point_time.strftime('%H:%M')
+    first_line = f"{date} {time} {point_temp_feels_like}C".ljust(
+        LCD_LINE_LENGTH, " ")
+
+    chance_precip = f"{str(chance_precip).rjust(3, '0')}%"
+    precip_rate = f"{float(precip_rate):05.2f}mm"
+    second_line = f"{chance_precip} {precip_rate} @@".ljust(16, " ")
+
+    return first_line + second_line
 
 
 def format_weather_info_page(location: str, freq: str) -> str:
