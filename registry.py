@@ -42,4 +42,4 @@ def execute_command(command_str) -> list[str]:
         except Exception as e:
             return [f"Err: {str(e)[:12]}"]
 
-    return f"Unknown: {cmd}"
+    return [f"Unknown: {cmd}"]
