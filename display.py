@@ -85,6 +85,20 @@ class DisplayManager:
         self.total_display_pages = 0
         self.current_state = IDLING
 
+    def sleep(self) -> None:
+        """ Turns the screen backlight off and clears the screen"""
+        self.lcd.clear()
+        self.lcd.write(0, 0, "Sleeping...")
+        sleep(2)
+        self.lcd.closelight()
+
+    def wake(self) -> None:
+        """ Waking up the screen by turning the backlight on """
+        self.lcd.clear()
+        self.lcd.write(0, 0, "Waking up...")
+        self.lcd.openlight()
+        sleep(1)
+
     # DISPLAY
 
     def display_slides(self, slides_to_display: list[str]) -> None:

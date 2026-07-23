@@ -4,9 +4,10 @@ handling user input using curses, and calling the tools to perform the desired a
 """
 
 import curses
+import time
+
 from display import DisplayManager, IDLING, DISPLAYING, TYPING
 from registry import execute_command, load_tools
-
 
 # --- Constants for Key Codes ---
 KEY_CTRL_C = 3
@@ -16,6 +17,8 @@ KEYS_BACKSPACE = (8, 127, curses.KEY_BACKSPACE)
 
 LCD_LINE_LENGTH = 16
 LCD_NUMBER_OF_LINES = 2
+
+INACTIVITY_LIMIT = 120  # 120 seconds or two minutes
 
 
 def render_terminal_debug(stdscr: 'curses._CursesWindow', display_manager: DisplayManager, input_buffer: str) -> None:
@@ -71,12 +74,24 @@ def process_keystroke(char_code: int, stdscr: 'curses._CursesWindow', display_ma
     return input_buffer, True
 
 
+def sleep_until_woken(display_manager: DisplayManager, stdscr: 'curses._CursesWindow'):
+    """ For putting the display manager to sleep, and waiting for a key press to come back online. """
+    display_manager.sleep()
+    stdscr.timeout(-1)  # Sets the curser to block indefinitely
+    stdscr.getch()  # Waits until any key is pressed
+    stdscr.getch(50)  # Sets the wait to 50ms again
+    display_manager.wake()
+
+
 def main(stdscr: 'curses._CursesWindow') -> None:
     """The main function that initializes the LCD and starts the REPL loop."""
     # Setup curses environment
     curses.curs_set(0)     # Hide the blinking terminal cursor
     # Waits 50ms before running the loop to continue the render
     stdscr.timeout(50)
+
+    # For tracking when the last key was pressed so that can timeout screen
+    last_activity = time.time()
 
     display_manager = DisplayManager(LCD_LINE_LENGTH, LCD_NUMBER_OF_LINES)
     input_buffer = ""
@@ -94,9 +109,14 @@ def main(stdscr: 'curses._CursesWindow') -> None:
 
             # 3. Handle Input
             if char_code != -1:
+                last_activity = time.time()
                 input_buffer, keep_running = process_keystroke(
                     char_code, stdscr, display_manager, input_buffer
                 )
+            else:
+                # Checks if the inactivity time reached
+                if time.time() - last_activity > INACTIVITY_LIMIT:
+                    sleep_until_woken(display_manager, stdscr)
 
             # 4. Render updates to the physical hardware LCD
             display_manager.render()
