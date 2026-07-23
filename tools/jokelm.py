@@ -1,42 +1,39 @@
-from pydantic import BaseModel
-from google import genai
-from google.genai import types
+import json
 from os import environ
-from dotenv import load_dotenv
 
 from registry import register_tool
 
-# --- Define the desired output structure ---
 
+def generate_jokes(client, topic: str) -> dict:
+    """Fetches jokes as a raw JSON string and parses it with Python's built-in json module."""
 
-class JokeItem(BaseModel):
-    joke: str
-    answer: str
+    # Lazy import: Only loaded when a joke is actively being generated
+    from google.genai import types
 
-
-class JokeList(BaseModel):
-    jokes: list[JokeItem]
-
-
-def generate_jokes(client: genai.Client, topic: str) -> JokeList:
-    """Fetches a list of jokes from Gemini and returns a structured Python object."""
     response = client.models.generate_content(
         model="gemini-3.1-flash-lite",
-        contents=f"Give me 3 funny jokes about {topic} with answers.",
+        # Explicitly instruct the model on the exact JSON shape since we removed Pydantic
+        contents=f"Give me 3 funny jokes about {topic} with answers. "
+        f"Respond ONLY with a JSON object containing a 'jokes' key. "
+        f"The value must be a list of objects with 'joke' and 'answer' keys.",
         config=types.GenerateContentConfig(
             thinking_config=types.ThinkingConfig(thinking_level="MINIMAL"),
             response_mime_type="application/json",
-            response_schema=JokeList,
         ),
     )
 
-    # Parse the complete JSON response into your Pydantic model
-    return JokeList.model_validate_json(response.text)
+    # Parse the text response into a standard Python dictionary
+    return json.loads(response.text)
 
 
 @register_tool(name="jokelm", help_text="A tool for coming up with jokes on a specific topic.")
 def jokes(topic: str) -> list[str]:
     """Takes a topic string and returns a flat list alternating between jokes and answers for LCD slides."""
+
+    # --- LAZY IMPORTS ---
+    # These execute only when the tool is called, keeping your app startup fast!
+    from dotenv import load_dotenv
+    from google import genai
 
     # Load environment variables
     load_dotenv()
@@ -50,13 +47,14 @@ def jokes(topic: str) -> list[str]:
     # Converts the jokes and answers to a flat list of slides for the LCD
     slides = []
 
-    # Access the 'jokes' list inside the JokeList Pydantic object
-    for item in jokes_data.jokes:
-        slides.append(item.joke)
-        slides.append(item.answer)
+    # Access the list of dictionaries safely
+    for item in jokes_data.get("jokes", []):
+        slides.append(item.get("joke", ""))
+        slides.append(item.get("answer", ""))
 
     return slides
 
 
 if __name__ == '__main__':
+    # Test the execution
     print(jokes('tigers'))
