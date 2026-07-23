@@ -175,7 +175,7 @@ def format_time_point_hourly(weather_data: dict) -> str:
 
         point_time = datetime.fromisoformat(
             weather_data['time']).astimezone(UK_TZ)
-        point_temp_feels_like = weather_data['feelsLikeTemperature']
+        point_temp_feels_like = weather_data['screenTemperature']
         chance_precip = weather_data['probOfPrecipitation']
         precip_rate = weather_data['precipitationRate']
     except AttributeError as e:
