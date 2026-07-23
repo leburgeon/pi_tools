@@ -79,7 +79,7 @@ def sleep_until_woken(display_manager: DisplayManager, stdscr: 'curses._CursesWi
     display_manager.sleep()
     stdscr.timeout(-1)  # Sets the curser to block indefinitely
     stdscr.getch()  # Waits until any key is pressed
-    stdscr.getch(50)  # Sets the wait to 50ms again
+    stdscr.timeout(50)  # Sets the wait to 50ms again
     display_manager.wake()
 
 
