@@ -26,7 +26,7 @@ def load_tools(tools_dir="tools"):
             importlib.import_module(f"{tools_dir}.{module_name}")
 
 
-def execute_command(command_str):
+def execute_command(command_str) -> list[str]:
     """Parses input text and routes execution to the registered tool."""
     if not command_str.strip():
         return ""
@@ -38,8 +38,8 @@ def execute_command(command_str):
         try:
             return TOOLS[cmd]["func"](*args)
         except TypeError as e:
-            return f"Err: Invalid args"
+            return [f"Err: Invalid args"]
         except Exception as e:
-            return f"Err: {str(e)[:12]}"
+            return [f"Err: {str(e)[:12]}"]
 
     return f"Unknown: {cmd}"
