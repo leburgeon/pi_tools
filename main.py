@@ -14,6 +14,9 @@ KEY_ESC = 27
 KEYS_ENTER = (10, 13, curses.KEY_ENTER)
 KEYS_BACKSPACE = (8, 127, curses.KEY_BACKSPACE)
 
+LCD_LINE_LENGTH = 16
+LCD_NUMBER_OF_LINES = 2
+
 
 def render_terminal_debug(stdscr: 'curses._CursesWindow', display_manager: DisplayManager, input_buffer: str) -> None:
     """Clears the terminal screen and displays current debug information."""
@@ -39,7 +42,7 @@ def process_keystroke(char_code: int, stdscr: 'curses._CursesWindow', display_ma
             curses.napms(500)
 
             result = execute_command(input_buffer)
-            display_manager.display_text(result)
+            display_manager.display_slides(result)
             return "", True
 
         elif display_manager.current_state == DISPLAYING:
@@ -75,7 +78,7 @@ def main(stdscr: 'curses._CursesWindow') -> None:
     # Waits 50ms before running the loop to continue the render
     stdscr.timeout(50)
 
-    display_manager = DisplayManager(line_length=16, num_lines=2)
+    display_manager = DisplayManager(LCD_LINE_LENGTH, LCD_NUMBER_OF_LINES)
     input_buffer = ""
     keep_running = True
 

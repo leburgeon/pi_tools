@@ -28,9 +28,14 @@ class DisplayManager:
         self.line_length = line_length
         self.num_lines = num_lines
 
+        # For storing the current text being displayed
         self.display_text_state = ""
         self.current_display_page = 0
         self.total_display_pages = 0
+
+        # For storing the slides to display
+        self.slides = []
+        self.current_slide = 0
 
         self.current_state = IDLING
 
@@ -81,6 +86,12 @@ class DisplayManager:
         self.current_state = IDLING
 
     # DISPLAY
+
+    def display_slides(self, slides_to_display: list[str]) -> None:
+        """Sets the slides to display, setting the first of the slides to the display text.
+        Each slide represents a chunk or group of information to display, and can be spread across multiple display pages."""
+        if len(slides_to_display) == 1:
+            self.display_text(slides_to_display[0])
 
     def display_text(self, text_to_display: str) -> None:
         """Sets the display mode to show the provided text and calculates pagination."""
