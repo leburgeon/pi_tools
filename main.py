@@ -18,7 +18,7 @@ KEYS_BACKSPACE = (8, 127, curses.KEY_BACKSPACE)
 LCD_LINE_LENGTH = 16
 LCD_NUMBER_OF_LINES = 2
 
-INACTIVITY_LIMIT = 120  # 120 seconds or two minutes
+INACTIVITY_LIMIT = 5  # 120 seconds or two minutes
 
 
 def render_terminal_debug(stdscr: 'curses._CursesWindow', display_manager: DisplayManager, input_buffer: str) -> None:
